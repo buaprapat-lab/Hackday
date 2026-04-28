@@ -25,7 +25,7 @@ export default function SideBar(){
         let mem=null;
          mem= diary.filter(mem=>mem.mood===myMood)
         console.log(mem);
-        if(mem.length===0){
+        if(myMood==="all"||!myMood){
         console.log(mem);
 
         return diary.map((memory) => (
