@@ -1,81 +1,118 @@
-import React, { useState } from 'react';
+﻿import { useState } from 'react'
 
-export default function DiaryEditor({ onCreate, today = "2026-04-28" }) {
-  const [text, setText] = useState('');
-  const [selectedMood, setSelectedMood] = useState('');
+const moodOptions = [
+  { name: 'happy', emoji: '😊' },
+  { name: 'sad', emoji: '😢' },
+  { name: 'fear', emoji: '😱' },
+  { name: 'strong', emoji: '💪' },
+  { name: 'angry', emoji: '😡' },
+  { name: 'love', emoji: '🥰' },
+  { name: 'joy', emoji: '😃' },
+]
 
-  const moodList = ['😆', '😊', '🙂', '😐', '😕', '😠', '😢'];
+const formatToday = () => {
+  const now = new Date()
+  return now.toLocaleDateString('th-TH', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  })
+}
+
+export default function DiaryEditor({ onCreate, onUpdate, onCancelEdit, editingEntry }) {
+  const [text, setText] = useState(editingEntry ? editingEntry.text : '')
+  const [selectedMood, setSelectedMood] = useState(editingEntry ? editingEntry.mood : '')
+  const today = formatToday()
 
   const handleSave = () => {
-    if (!text || !selectedMood) {
-      return alert("กรุณากรอกข้อความและเลือกอารมณ์ก่อนครับ");
+    if (!text.trim() || !selectedMood) {
+      return alert('กรุณากรอกข้อความและเลือกอารมณ์ก่อนครับ')
     }
 
-    // สร้าง Object ข้อมูลเตรียมส่งให้เพื่อน
-    const newEntry = {
-      id: Date.now(),
-      date: today,
-      content: text,
-      mood: selectedMood,
-      timestamp: new Date().toISOString()
-    };
+    if (editingEntry) {
+      // Update existing entry
+      const updatedEntry = {
+        ...editingEntry,
+        text: text.trim(),
+        mood: selectedMood,
+        timestamp: new Date().toISOString(),
+      }
+      onUpdate(updatedEntry)
+    } else {
+      // Create new entry
+      const newEntry = {
+        id: Date.now(),
+        date: new Date(),
+        text: text.trim(),
+        mood: selectedMood,
+        timestamp: new Date().toISOString(),
+      }
+      onCreate(newEntry)
+    }
+    setText('')
+    setSelectedMood('')
+  }
 
-    // ส่ง Object กลับไปที่ Component หลัก (ตัวแม่)
-    onCreate(newEntry);
-
-    // ล้างค่าฟอร์ม
-    setText('');
-    setSelectedMood('');
-  };
+  const handleCancel = () => {
+    setText('')
+    setSelectedMood('')
+    if (onCancelEdit) onCancelEdit()
+  }
 
   return (
-    <div className="w-full max-w-2xl mx-auto shadow-sm">
-      {/* Header Date */}
-      <div className="bg-gray-300 p-2 rounded-t-2xl text-[10px] font-bold px-6 text-gray-600">
-        DATE: {today}
+    <section className="w-full rounded-[40px] bg-white p-6 shadow-xl md:p-10">
+      <div className="mb-6 rounded-[32px] bg-slate-100 p-4 text-slate-500 shadow-sm">
+        <div className="text-xs uppercase tracking-[0.3em] text-slate-500">DATE</div>
+        <div className="text-sm font-semibold text-slate-900">{today}</div>
       </div>
 
-      {/* Textarea Area */}
-      <div className="bg-[#FFF7ED] p-10 rounded-b-3xl border-2 border-[#FFEDD5] relative h-72 mb-6">
-        <span className="absolute top-4 left-8 text-[10px] font-black text-orange-200 uppercase tracking-widest">
+      <div className="relative mb-8 rounded-[32px] bg-[#FFF7ED] p-8 shadow-inner">
+        <span className="absolute left-8 top-8 text-[10px] font-black uppercase tracking-widest text-orange-200">
           To My Self
         </span>
-        <textarea 
+        <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="Do your best!" 
-          className="w-full h-full bg-transparent outline-none text-3xl italic text-gray-600 placeholder-orange-100 resize-none"
+          placeholder="Do your best!"
+          className="h-64 w-full resize-none bg-transparent text-3xl italic text-slate-600 outline-none placeholder-orange-100"
         />
       </div>
 
-      {/* Mood Selector */}
-      <div className="flex justify-between bg-white p-5 rounded-[40px] shadow-md border border-gray-100 mb-6 px-8">
-        {moodList.map(m => (
-          <button 
-            key={m} 
-            onClick={() => setSelectedMood(m)} 
-            className={`text-5xl transition-all ${selectedMood === m ? 'scale-125' : 'grayscale opacity-30'}`}
-          >
-            {m}
-          </button>
-        ))}
+      <div className="mb-8 rounded-[40px] bg-white p-5 shadow-md border border-slate-100">
+        <div className="grid grid-cols-4 gap-3">
+          {moodOptions.map((mood) => (
+            <button
+              key={mood.name}
+              type="button"
+              onClick={() => setSelectedMood(mood.name)}
+              className={`rounded-3xl p-4 text-4xl transition ${
+                selectedMood === mood.name ? 'bg-slate-900 text-white shadow-xl' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+              }`}
+            >
+              {mood.emoji}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* Action Buttons */}
-      <div className="flex gap-4">
-        <button 
+      <div className="grid gap-4 md:grid-cols-3">
+        <button
+          type="button"
           onClick={handleSave}
-          className="flex-1 bg-gray-800 hover:bg-black text-white py-5 rounded-2xl font-black uppercase text-xl transition-all"
+          className="rounded-3xl bg-slate-900 px-6 py-5 text-white transition hover:bg-black"
         >
-          Create
+          {editingEntry ? 'Update' : 'Create'}
         </button>
-        <button disabled className="flex-1 bg-gray-200 text-gray-400 py-5 rounded-2xl font-black uppercase cursor-not-allowed">
-          Update
-        </button>
-        <button disabled className="flex-1 bg-gray-200 text-gray-400 py-5 rounded-2xl font-black uppercase cursor-not-allowed">
-          Delete
-        </button>
+        {editingEntry && (
+          <button
+            type="button"
+            onClick={handleCancel}
+            className="rounded-3xl bg-slate-500 px-6 py-5 text-white transition hover:bg-slate-600"
+          >
+            Cancel
+          </button>
+        )}
       </div>
-    </div>
-  );
+    </section>
+  )
 }
