@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -113,3 +114,6 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+=======
+@import "tailwindcss";
+>>>>>>> 17cc7e18222b77a09c046e86ae2e683e152ff6f5
