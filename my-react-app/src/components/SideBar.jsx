@@ -9,13 +9,13 @@ export default function SideBar(){
 
     function checkmood(moods){
         switch(moods){
-            case("happy"):return "😊"; break;
-            case("sad"):return "😢";break;
-            case("fear"):return "😱";break;
-            case("strong"):return "💪";break;
-            case("angry"):return "😡";break;
-            case("love"):return "🥰";break;
-            case("joy"):return "😃";break;
+            case("happy"):return "😊";
+            case("sad"):return "😢";
+            case("fear"):return "😱";
+            case("strong"):return "💪";
+            case("angry"):return "😡";
+            case("love"):return "🥰";
+            case("joy"):return "😃";
         default:return" ";
         }
 
@@ -25,7 +25,7 @@ export default function SideBar(){
         let mem=null;
          mem= diary.filter(mem=>mem.mood===myMood)
         console.log(mem);
-        if(mem.length===0){
+        if(myMood==="all"||!myMood){
         console.log(mem);
 
         return diary.map((memory) => (

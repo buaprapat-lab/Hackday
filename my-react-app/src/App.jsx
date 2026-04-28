@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import SideBar from './components/SideBar'
 import DiaryEditor from './components/DiaryEditor';
 
